@@ -129,18 +129,18 @@
           <v-btn @click="createDialog = false" icon><v-icon>mdi-close</v-icon></v-btn>
         </v-toolbar>
         <v-card-text>
-          <v-form class="mt-5">
-            <v-text-field label="Name" outlined></v-text-field>
-            <v-text-field label="Email Address" outlined></v-text-field>
-            <v-text-field label="Contact Number" outlined></v-text-field>
-            <v-textarea outlined label="Address" rows="2"></v-textarea>
-            <v-text-field label="Age" type="number" outlined></v-text-field>
-            <v-checkbox label="Is VIP"></v-checkbox>
+          <v-form class="mt-5" ref="form" v-model="valid" lazy-validation>
+            <v-text-field label="Name" :rules="nameRules" v-model="customerName" outlined></v-text-field>
+            <v-text-field label="Email Address" v-model="customerEmail" outlined></v-text-field>
+            <v-text-field label="Contact Number" v-model="customerPhone" outlined></v-text-field>
+            <v-textarea outlined label="Address" v-model="customerAddress" rows="2"></v-textarea>
+            <v-text-field label="Age" type="number" v-model="customerAge" outlined></v-text-field>
+            <v-checkbox label="Is VIP" v-model="isVip"></v-checkbox>
           </v-form>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="primary" block class="my-5">Submit</v-btn>
+          <v-btn color="primary" @click="createCustomer()" block class="my-3">Submit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -177,9 +177,15 @@ export default {
         customerName: "",
         customerEmail: "",
         customerPhone: "",
+        customerAddress: "",
         customerAge: 0,
-        customerPhoto: ""
-    }
+        customerPhoto: "",
+        isVip: false,
+        valid: true,
+        nameRules: [
+          v => !!v || 'Name is required',
+        ],
+    };
   },
   methods: {
     getCustomers() {
@@ -201,9 +207,29 @@ export default {
     this.customerEmail = item.Email;  
     this.customerPhone = item.Phone;
     this.customerAge = item.Age;
-    this.customerPhoto = item.Photo;  
+    this.customerPhoto = item.profilePicture;  
     this.customerDialog = true;
-    }
+    },
+
+    createCustomer() {
+      if (this.$refs.form.validate()) {
+        console.log("Validate");
+        let payload = {
+          name: this.customerName,
+          email: this.customerEmail,
+          phone: this.customerPhone,
+          address: this.customerAddress,
+          age: this.customerAge,
+          isVip: this.isVip,
+      };
+
+      console.log("Payload", payload);
+      this.createDialog = false;
+      this.$refs.form.reset();
+      } else {
+        console.log("Validate data");
+      }
+    },
   },
 
   mounted() {
